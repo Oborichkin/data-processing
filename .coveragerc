@@ -1,0 +1,13 @@
+[run]
+omit =
+    */.local/*
+    /usr/*
+    */__init__.py
+    tests/
+    ./venv/*
+    setup.py
+
+[report]
+exclude_lines =
+    # pragma: no cover
+    raise NotImplementedError
