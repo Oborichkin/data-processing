@@ -1,3 +1,5 @@
+import struct
+
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,13 +9,13 @@ class Image:
     def __init__(self, img: np.ndarray = None):
         self.img = img
 
-    def plot(self, dpi: int = 80):
-        height, width, _ = self.img.shape
+    def plot(self, dpi: int = 80, cmap="gray"):
+        height, width = self.img.shape[0], self.img.shape[1]
         figsize = width / float(dpi), height / float(dpi)
         fig = plt.figure(figsize=figsize)
         ax = fig.add_axes([0, 0, 1, 1])
         ax.axis("off")
-        plt.imshow(self.img)
+        plt.imshow(self.img, cmap=cmap)
         plt.show()
 
     def scale(self, ratio: float = 1, method: str = "nn") -> "Image":
@@ -49,5 +51,13 @@ class Image:
         return Image(rescaled)
 
     @staticmethod
-    def from_file(filepath) -> "Image":
+    def from_file(filepath: str) -> "Image":
         return Image(cv2.imread(filepath))
+
+    def from_xcr(filepath: str, w: int, h: int) -> "Image":
+        with open(filepath, "rb") as f:
+            result = list(struct.unpack(f"{w*h}h", f.read()))
+        result = np.asarray(result).astype("float64")
+        result = 255 * (result - result.min()) / result.ptp()
+        result = result.reshape((w, h))
+        return Image(result)

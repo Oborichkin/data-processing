@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
 from src.base import number, vector
@@ -9,6 +10,9 @@ class Line:
 
     def __len__(self):
         return len(self.y)
+
+    def plot(self):
+        plt.plot(self.y)
 
     @staticmethod
     def linear(a: number = 1, b: number = 0, range_: vector = np.arange(0, 1, 0.1)) -> "Line":
