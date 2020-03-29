@@ -23,4 +23,3 @@ repos:
     - id: check-symlinks
     - id: mixed-line-ending
     - id: trailing-whitespace
-    - id: check-added-large-files
