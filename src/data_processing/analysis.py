@@ -3,6 +3,14 @@ from typing import List
 import numpy as np
 
 from src.base.line import Line
+from src.data_processing.io.image import Image
+
+
+def histogram(img: Image):
+    hist = np.zeros(256)
+    for px in np.nditer(img.img, op_flags=["readwrite"]):
+        hist[max(0, min(int(px), 255))] += 1
+    return Line(hist)
 
 
 def dft(line: Line) -> List[complex]:
@@ -17,6 +25,10 @@ def dft(line: Line) -> List[complex]:
             sumImag += line.y[t] * np.sin(angle)
         result[k] = complex(sumReal / n, sumImag / n)
     return result
+
+
+def get_frequency_spectrum(dft: List[complex]):
+    return Line([abs(x) for x in dft][: len(dft) // 2])
 
 
 def idft(vector: List[complex]) -> Line:

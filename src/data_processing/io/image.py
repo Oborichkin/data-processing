@@ -1,3 +1,5 @@
+import os
+import random
 import struct
 
 import cv2
@@ -6,8 +8,17 @@ import numpy as np
 
 
 class Image:
-    def __init__(self, img: np.ndarray = None):
+    def __init__(self, img: np.ndarray = None, title: str = None):
         self.img = img
+        self.title = title
+
+    @property
+    def width(self):
+        return self.img.shape[0]
+
+    @property
+    def height(self):
+        return self.img.shape[1]
 
     def plot(self, dpi: int = 80, cmap="gray"):
         height, width = self.img.shape[0], self.img.shape[1]
@@ -15,6 +26,7 @@ class Image:
         fig = plt.figure(figsize=figsize)
         ax = fig.add_axes([0, 0, 1, 1])
         ax.axis("off")
+        ax.set_title(self.title)
         plt.imshow(self.img, cmap=cmap)
         plt.show()
 
@@ -50,9 +62,24 @@ class Image:
                 rescaled[i, j] = A * (1 - dx) * (1 - dy) + B * (dx) * (1 - dy) + C * (dy) * (1 - dx) + D * (dx * dy)
         return Image(rescaled)
 
+    def noise(self, intensity: float, mode="gauss") -> "Image":
+        if mode == "gauss":
+            return Image(
+                self.img.copy()
+                + np.random.normal(0, 255 * intensity, size=self.height * self.width).reshape(self.img.shape),
+                title=f"{self.title} (Gaussian: {intensity})",
+            )
+        elif mode == "sp":
+            result = self.img.copy()
+            for px in np.nditer(result, op_flags=["readwrite"]):
+                if random.random() < intensity:
+                    sp = random.choice([0, 255])
+                    px[...] = sp
+            return Image(result, title=f"{self.title} (Salt&Pepper: {intensity})")
+
     @staticmethod
-    def from_file(filepath: str) -> "Image":
-        return Image(cv2.imread(filepath))
+    def from_file(filepath: str, flags=cv2.IMREAD_GRAYSCALE) -> "Image":
+        return Image(cv2.imread(filepath, flags=flags), title=os.path.basename(filepath))
 
     def from_xcr(filepath: str, w: int, h: int) -> "Image":
         with open(filepath, "rb") as f:
