@@ -20,6 +20,9 @@ class Image:
     def height(self):
         return self.img.shape[1]
 
+    def __sub__(self, other: "Image") -> "Image":
+        return Image(img=self.img - other.img)
+
     def plot(self, dpi: int = 80, cmap="gray"):
         height, width = self.img.shape[0], self.img.shape[1]
         figsize = width / float(dpi), height / float(dpi)
@@ -81,6 +84,16 @@ class Image:
     def from_file(filepath: str, flags=cv2.IMREAD_GRAYSCALE) -> "Image":
         return Image(cv2.imread(filepath, flags=flags), title=os.path.basename(filepath))
 
+    @staticmethod
+    def from_dat(filepath: str, w: int, h: int) -> "Image":
+        with open(filepath, "rb") as f:
+            result = list(struct.unpack(f"{w*h}f", f.read()))
+        result = np.asarray(result).astype("float64")
+        result = 255 * (result - result.min()) / result.ptp()
+        result = result.reshape((w, h))
+        return Image(result)
+
+    @staticmethod
     def from_xcr(filepath: str, w: int, h: int) -> "Image":
         with open(filepath, "rb") as f:
             result = list(struct.unpack(f"{w*h}h", f.read()))

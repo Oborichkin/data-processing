@@ -1,3 +1,5 @@
+import struct
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -13,6 +15,18 @@ class Line:
 
     def plot(self):
         plt.plot(self.y)
+
+    def __pow__(self: "Line", other: "Line") -> "Line":
+        y = list()
+        y.extend(self.y)
+        y.extend(other.y)
+        return Line(y=y)
+
+    @staticmethod
+    def from_dat(filepath: str) -> "Line":
+        with open(filepath, "rb") as f:
+            result = f.read()
+        return Line(y=struct.unpack(f"{len(result)//4}f", result))
 
     @staticmethod
     def linear(a: number = 1, b: number = 0, range_: vector = np.arange(0, 1, 0.1)) -> "Line":

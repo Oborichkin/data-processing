@@ -41,3 +41,15 @@ def idft(vector: List[complex]) -> Line:
             sum_ += vector[t].real * np.cos(angle) + vector[t].imag * np.sin(angle)
         result[k] = sum_
     return Line(result)
+
+
+def _idft(r, i):
+    n = len(r)
+    result = np.zeros(n)
+    for k in range(n):
+        sum_ = 0
+        for t in range(n):
+            angle = (2 * np.pi * k * t) / n
+            sum_ += r[t] * np.cos(angle) + i[t] * np.sin(angle)
+        result[k] = sum_
+    return result
