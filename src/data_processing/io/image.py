@@ -5,6 +5,9 @@ import struct
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy import stats
+
+from src.base.line import Line
 
 
 class Image:
@@ -32,6 +35,21 @@ class Image:
         ax.set_title(self.title)
         plt.imshow(self.img, cmap=cmap)
         plt.show()
+
+    def histogram(self, bins: int = 10) -> Line:
+        counts, bins = np.histogram(self.img, bins)
+        plt.figure(figsize=(20, 5))
+        plt.hist(bins[:-1], bins, weights=counts)
+
+    @property
+    def mean(self):
+        return np.mean(self.img)
+
+    @property
+    def mode(self):
+        values, counts = np.unique(self.img.flatten(), return_counts=True)
+        m = counts.argmax()
+        return values[m], counts[m]
 
     def scale(self, ratio: float = 1, method: str = "nn") -> "Image":
         if method == "nn":

@@ -7,14 +7,17 @@ from src.base import number, vector
 
 
 class Line:
-    def __init__(self, y):
+    def __init__(self, y, x=None):
+        assert len(y) == len(x) or x is None
         self.y = y
+        self.x = x if x is None else range(len(y))
 
     def __len__(self):
         return len(self.y)
 
     def plot(self):
-        plt.plot(self.y)
+        plt.figure(figsize=(20, 5))
+        plt.plot(self.x, self.y)
 
     def __pow__(self: "Line", other: "Line") -> "Line":
         y = list()
