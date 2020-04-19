@@ -8,9 +8,9 @@ from src.base import number, vector
 
 class Line:
     def __init__(self, y, x=None):
-        assert len(y) == len(x) or x is None
+        assert x is None or len(y) == len(x)
         self.y = y
-        self.x = x if x is None else range(len(y))
+        self.x = x if x is not None else range(len(y))
 
     def __len__(self):
         return len(self.y)
