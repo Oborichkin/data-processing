@@ -26,6 +26,9 @@ class Image:
     def __sub__(self, other: "Image") -> "Image":
         return Image(img=self.img - other.img)
 
+    def __add__(self, other: "Image") -> "Image":
+        return Image(img=self.img + other.img)
+
     def threashold(self, start: int = 0, end: int = 255) -> "Image":
         _, thresh = cv2.threshold(self.img, start, end, cv2.THRESH_BINARY)
         return Image(thresh)
@@ -53,6 +56,14 @@ class Image:
         counts, bins = np.histogram(self.img, bins)
         plt.figure(figsize=(20, 5))
         plt.hist(bins[:-1], bins, weights=counts)
+
+    def erode(self, iterations=1, kernel_size=5) -> "Image":
+        kernel = np.ones((kernel_size, kernel_size), np.uint8)
+        return Image(cv2.erode(self.img, kernel, iterations))
+
+    def dilate(self, iterations=1, kernel_size=5) -> "Image":
+        kernel = np.ones((kernel_size, kernel_size), np.uint8)
+        return Image(cv2.dilate(self.img, kernel, iterations))
 
     @property
     def mean(self):
