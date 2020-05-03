@@ -26,6 +26,19 @@ class Image:
     def __sub__(self, other: "Image") -> "Image":
         return Image(img=self.img - other.img)
 
+    def threashold(self, start: int = 0, end: int = 255) -> "Image":
+        _, thresh = cv2.threshold(self.img, start, end, cv2.THRESH_BINARY)
+        return Image(thresh)
+
+    def laplacian(self, depth: int) -> "Image":
+        laplacian = cv2.Laplacian(self.img, depth)
+        return Image(laplacian)
+
+    def normalize(self):
+        self.img -= self.img.min()
+        self.img /= self.img.max()
+        self.img *= 255
+
     def plot(self, dpi: int = 80, cmap="gray"):
         height, width = self.img.shape[0], self.img.shape[1]
         figsize = width / float(dpi), height / float(dpi)
