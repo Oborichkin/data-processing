@@ -65,6 +65,15 @@ class Image:
         kernel = np.ones((kernel_size, kernel_size), np.uint8)
         return Image(cv2.dilate(self.img, kernel, iterations))
 
+    def gamma(self, gamma=None) -> "Image":
+        gamma = np.log((self.img.max() - self.img.min()) / 2) / np.log(self.img.mean()) if not gamma else gamma
+        invGamma = 1.0 / gamma
+        table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
+        return Image(cv2.LUT(self.img.astype("uint8"), table))
+
+    def equalize(self) -> "Image":
+        return Image(cv2.equalizeHist(self.img.astype("uint8")))
+
     @property
     def mean(self):
         return np.mean(self.img)
@@ -82,6 +91,9 @@ class Image:
             return self._bilinear_interpolation(ratio)
         else:
             raise NotImplementedError
+
+    def resize(self, dst_size) -> "Image":
+        return Image(cv2.resize(self.img, dst_size))
 
     def _nearest_neighbour(self, ratio) -> "Image":
         x, y, z = self.img.shape
@@ -130,6 +142,15 @@ class Image:
     def from_dat(filepath: str, w: int, h: int) -> "Image":
         with open(filepath, "rb") as f:
             result = list(struct.unpack(f"{w*h}f", f.read()))
+        result = np.asarray(result).astype("float64")
+        result = 255 * (result - result.min()) / result.ptp()
+        result = result.reshape((w, h))
+        return Image(result)
+
+    @staticmethod
+    def from_bin(filepath: str, w: int, h: int) -> "Image":
+        with open(filepath, "rb") as f:
+            result = list(struct.unpack(f"{w*h}h", f.read()))
         result = np.asarray(result).astype("float64")
         result = 255 * (result - result.min()) / result.ptp()
         result = result.reshape((w, h))
